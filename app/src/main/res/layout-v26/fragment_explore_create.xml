@@ -1,0 +1,44 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.nyc.polymerse.fragments.ExploreCreateFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <ImageView
+        android:id="@+id/explore_create_image"
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"
+        android:text="@string/hello_blank_fragment"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/nothing_to_do_here_template"/>
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" 
+        android:text="@string/description_explore_pic_textview"
+        android:layout_marginStart="20dp"/>
+
+    <EditText
+        android:id="@+id/explore_pic_description"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:gravity="top"
+        android:hint="@string/explore_pic_description"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" 
+        android:text="@string/explore_language_textview"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"/>
+    
+    <Spinner
+        android:id="@+id/explore_lang_spinner"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp">
+    </Spinner>
+</LinearLayout>

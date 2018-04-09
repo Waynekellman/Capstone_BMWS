@@ -177,6 +177,17 @@
             android:layout_marginEnd="7dp"
             android:src="@drawable/ic_edit" />
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/take_explore_pic_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="100dp"
+            android:src="@drawable/ic_photo_camera_black_24dp"
+            android:tint="#829ABC"/>
+
     </RelativeLayout>
 
 </LinearLayout>

@@ -2,6 +2,8 @@ package com.nyc.polymerse.Profile_Creation;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -41,4 +43,5 @@ public class Prof_Create_Activity extends AppCompatActivity {
         Intent intent = new Intent(Prof_Create_Activity.this, MyProfileActivity.class);
         startActivity(intent);
     }
+
 }

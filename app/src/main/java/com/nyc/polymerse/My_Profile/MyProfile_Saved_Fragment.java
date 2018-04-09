@@ -1,11 +1,15 @@
 package com.nyc.polymerse.My_Profile;
 
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,9 +19,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,13 +34,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.nyc.polymerse.Profile_Creation.Prof_Create_Activity;
 import com.nyc.polymerse.R;
 import com.nyc.polymerse.User;
 import com.nyc.polymerse.UserSingleton;
+import com.nyc.polymerse.fragments.ExploreCreateFragment;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -50,6 +61,7 @@ public class MyProfile_Saved_Fragment extends Fragment {
     View rootView;
     Button addProfileImage;
     FloatingActionButton editProfileButton;
+    FloatingActionButton takeExplorePic;
     CircleImageView profileImage;
     TextView name_Input;
     TextView location_Input;
@@ -63,6 +75,9 @@ public class MyProfile_Saved_Fragment extends Fragment {
 
     protected static final int CAMERA_REQUEST = 0;
     protected static final int GALLERY_PICTURE = 1;
+    protected static final int EXPLORE_PICTURE = 2;
+    protected static final int MY_CAMERA_REQUEST_CODE = 100;
+    ;
     private Intent pictureActionIntent = null;
     Bitmap bitmap;
 
@@ -92,18 +107,82 @@ public class MyProfile_Saved_Fragment extends Fragment {
         sharing_Input = rootView.findViewById(R.id.sharing_lang_spinner);
         learningLevel = rootView.findViewById(R.id.myProfile_learning_level);
         sharingLevel = rootView.findViewById(R.id.myprof_sharing_level);
+        takeExplorePic = rootView.findViewById(R.id.take_explore_pic_fab);
         currentUser = UserSingleton.getInstance().getUser();
 
         profileDetails = getActivity().getSharedPreferences(PROF_CREATE_KEY, Context.MODE_PRIVATE);
+        if (getActivity().checkSelfPermission(Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            getActivity().requestPermissions(new String[]{Manifest.permission.CAMERA},
+                    MY_CAMERA_REQUEST_CODE);
+
+        }
 
         if (currentUser != null) {
             grabProfileURL();
             editProfileClick();
             setAddProfileImage();
             grabUserInfo();
+            setUpExploreFab();
         }
 
         return rootView;
+    }
+
+    private void setUpExploreFab() {
+        takeExplorePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                if (getActivity().checkSelfPermission(Manifest.permission.CAMERA)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    getActivity().requestPermissions(new String[]{Manifest.permission.CAMERA},
+                            MY_CAMERA_REQUEST_CODE);
+
+                } else {
+
+                    File photoFile = null;
+                    try {
+                        photoFile = createImageFile();
+                    } catch (IOException ex) {
+                        // Error occurred while creating the File
+                    }
+
+                    if (photoFile != null) {
+//                        Uri photoURI = FileProvider.getUriForFile(getActivity(),
+//                                getActivity().getApplicationContext().getPackageName() + ".provider",
+//                                photoFile);
+
+                        Intent explorePic = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        explorePic.putExtra(MediaStore.EXTRA_OUTPUT, photoFile);
+                        explorePic.putExtra("pic_absolute_path", mCurrentPhotoPath);
+                        getActivity().startActivityForResult(explorePic, EXPLORE_PICTURE);
+                    }
+                }
+            }
+        });
+    }
+
+    String mCurrentPhotoPath;
+    String mCurrentPhotoUriString;
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        Log.d(TAG, "createImageFile: path  " + mCurrentPhotoPath);
+        mCurrentPhotoUriString = image.toURI().toString();
+        return image;
     }
 
     public void editProfileClick() {
@@ -282,7 +361,7 @@ public class MyProfile_Saved_Fragment extends Fragment {
             sharingLevelString = "";
         }
 
-        if (learnLevel == null){
+        if (learnLevel == null) {
             learnLevel = "";
         }
         switch (learnLevel) {
@@ -335,6 +414,19 @@ public class MyProfile_Saved_Fragment extends Fragment {
                 Picasso.get().load(imgUrl).fit().placeholder(R.drawable.ic_account_circle_black_24dp).into(profileImage);
             }
         }
+    }
+
+    private void fragmentJump(Fragment fragment) {
+        switchContent(R.id.fragment_container, fragment);
+    }
+
+    public void switchContent(int id, Fragment fragment) {
+
+        if (getActivity() instanceof MyProfileActivity) {
+            MyProfileActivity myProfileActivity = (MyProfileActivity) getActivity();
+            myProfileActivity.switchContent(fragment);
+        }
+
     }
 
 }

@@ -60,6 +60,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
+        Log.d(TAG, "onCreate: ran");
         ButterKnife.bind(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -76,18 +77,29 @@ public class HomeActivity extends AppCompatActivity {
                 user = firebaseAuth.getCurrentUser();
                 if (user == null) {
                     // if user is null launch login activity
+                    Log.d(TAG, "onAuthStateChanged: no user");
                     startActivity(new Intent(HomeActivity.this, LoginActivity.class));
                     finish();
                 } else {
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString(Constants.FIREBASE_UID_KEY, user.getUid());
-                    editor.commit();
-                    Log.d(TAG, "onAuthStateChanged: user isn't null");
-                    Log.d(TAG, "onAuthStateChanged: " + user.getEmail());
-                    Log.d(TAG, "onAuthStateChanged: " + user.getUid());
-                    Toast.makeText(HomeActivity.this, user.getEmail() + " is logged in", Toast.LENGTH_SHORT).show();
-                    checkProfileOfUser();
+                    if (user.getEmail() != null) {
+                        if (!user.getEmail().equals("tester@gmail.com")) {
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString(Constants.FIREBASE_UID_KEY, user.getUid());
+                            editor.commit();
+                            Log.d(TAG, "onAuthStateChanged: user isn't null");
+                            Log.d(TAG, "onAuthStateChanged: " + user.getEmail());
+                            Log.d(TAG, "onAuthStateChanged: " + user.getUid());
+                            Toast.makeText(HomeActivity.this, user.getEmail() + " is logged in", Toast.LENGTH_SHORT).show();
+                            checkProfileOfUser();
+                        } else {
+                            Log.d(TAG, "onAuthStateChanged: random email " + user.getEmail());
 
+                            // I can't seem to signout this email. It's not in Firebase either so I just made a check for it.
+                            Log.d(TAG, "onAuthStateChanged: no user");
+                            startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+                            finish();
+                        }
+                    }
                 }
             }
         };
@@ -127,7 +139,6 @@ public class HomeActivity extends AppCompatActivity {
                     case R.id.nav_notification:
 
 
-
                         fragment = new NotificationFragment();
                         transaction.replace(R.id.fragment_container, fragment, "notifrag");
                         Log.d(TAG, "onOptionsItemSelected: notification clicked");
@@ -135,7 +146,6 @@ public class HomeActivity extends AppCompatActivity {
                         transaction.commit();
                         return true;
                     case R.id.nav_explore:
-
 
 
                         fragment = new ExploreFragment();
@@ -266,13 +276,16 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+        Log.d(TAG, "onStart: called");
         auth.addAuthStateListener(authListener);
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        Log.d(TAG, "onStop: called");
         if (authListener != null) {
+            Log.d(TAG, "onStop: auth removed");
             auth.removeAuthStateListener(authListener);
         }
     }

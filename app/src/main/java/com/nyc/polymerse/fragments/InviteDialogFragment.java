@@ -80,7 +80,7 @@ public class InviteDialogFragment extends android.support.v4.app.DialogFragment 
         location.setText(invite.getLocation());
         dialogBuilder.setView(v);
 
-        if (ID == invite.getSender_ID()) {
+        if (ID.equals(invite.getSender_ID())) {
             setAsSenderButtons(dialogBuilder, invite.getAcceptStatus());
         } else {
             setAsReceiverButton(dialogBuilder, invite.getAcceptStatus());

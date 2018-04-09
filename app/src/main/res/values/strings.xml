@@ -127,5 +127,8 @@
     <string name="block_details">Block</string>
     <string name="message_time">11:00</string>
     <string name="time_msg">10:30</string>
+    <string name="description_explore_pic_textview">Description</string>
+    <string name="explore_pic_description">Write a simple description of this picture...</string>
+    <string name="explore_language_textview">Language</string>
 
 </resources>

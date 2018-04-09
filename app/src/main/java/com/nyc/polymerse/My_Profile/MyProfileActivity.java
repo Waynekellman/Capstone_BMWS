@@ -1,6 +1,12 @@
 package com.nyc.polymerse.My_Profile;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,12 +20,20 @@ import com.google.firebase.auth.FirebaseUser;
 import com.nyc.polymerse.HomeActivity;
 import com.nyc.polymerse.R;
 import com.nyc.polymerse.SettingsActivity;
+import com.nyc.polymerse.fragments.ExploreCreateFragment;
 import com.nyc.polymerse.fragments.UserResultsFragment;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MyProfileActivity extends AppCompatActivity {
     private static final String TAG = null;
     private FirebaseAuth auth;
     private FirebaseUser user;
+    protected static final int EXPLORE_PICTURE = 2;
+
 
     //TODO: Add hide and show for fragments
 
@@ -36,9 +50,39 @@ public class MyProfileActivity extends AppCompatActivity {
         }
     }
 
+    Bitmap bitmap;
+
+    String selectedImagePath;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
+
+        bitmap = null;
+        selectedImagePath = null;
+
+        if (resultCode == RESULT_OK && requestCode == EXPLORE_PICTURE) {
+            Log.d(TAG, "onActivityResult: explore request code caught");
+            if (data != null) {
+
+                Bundle extras = data.getExtras();
+                if (extras != null) {
+                    Log.d(TAG, "onActivityResult: ExploreFrag ran");
+                    ExploreCreateFragment exploreCreateFragment = new ExploreCreateFragment();
+                    exploreCreateFragment.setArguments(extras);
+                    fragmentJump(exploreCreateFragment);
+
+                } else {
+                    Log.d(TAG, "onActivityResult: not bundle in data");
+                }
+            } else {
+                Log.d(TAG, "onActivityResult: no data");
+            }
+        }
+    }
+
+    private void fragmentJump(Fragment exploreCreateFragment) {
+        switchContent(exploreCreateFragment);
     }
 
     @Override
@@ -87,4 +131,11 @@ public class MyProfileActivity extends AppCompatActivity {
     }
 
 
+    public void switchContent(Fragment fragment) {
+
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.my_prof_fragment_container, fragment);
+        ft.addToBackStack("");
+        ft.commit();
+    }
 }
